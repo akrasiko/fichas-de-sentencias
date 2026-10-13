@@ -61,8 +61,10 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="p-3 font-bold text-slate-900 border-r border-slate-200">3. Partes</td>
-                  <td className="p-3 border-r border-slate-200">Involucrados en el caso (demandante, demandado, querellante, imputado, etc.)</td>
-                  <td className="p-3">Demandante: Inversiones Norte S.A.<br />Demandado: Constructora SpA</td>
+                  <td className="p-3 border-r border-slate-200">
+                    Involucrados en el caso expresando sus roles. <span className="text-emerald-700 font-medium block mt-0.5">Por protección de datos personales, los nombres de personas naturales (víctimas, imputados, testigos, peritos, etc.) se anonimizan únicamente con sus iniciales. Fiscales, defensores y abogados conservan su nombre.</span>
+                  </td>
+                  <td className="p-3">Demandante: Inversiones Norte S.A.<br />Imputada: M.E.V.V.<br />Fiscal: Jorge Velozo Correa</td>
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="p-3 font-bold text-slate-900 border-r border-slate-200">4. Tipo de procedimiento</td>

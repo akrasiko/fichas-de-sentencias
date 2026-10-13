@@ -49,36 +49,53 @@ app.post('/api/analyze-sentence', async (req, res) => {
             },
           },
           {
-            text: `Analiza la sentencia judicial contenida en el documento adjunto y elabora la ficha de análisis completa respondiendo rigurosamente a cada uno de los 10 ítems exigidos. Nombre de archivo: ${fileName || 'sentencia.pdf'}.`
+            text: `Analiza la sentencia judicial contenida en el documento adjunto y elabora la ficha de análisis completa respondiendo rigurosamente a cada uno de los 10 ítems exigidos. Nombre de archivo: ${fileName || 'sentencia.pdf'}. Recuerda aplicar rigurosamente la regla de anonimización con iniciales (ej. M.E.V.V.) para víctimas, imputados/partes particulares, testigos, peritos y familiares en todos los campos.`
           }
         ]
       };
     } else {
       // Plain text or Markdown
-      contents = `Analiza la siguiente sentencia judicial y elabora la ficha de análisis y resumen estructurada según los criterios dados:
+      contents = `Analiza la siguiente sentencia judicial y elabora la ficha de análisis y resumen estructurada según los criterios dados. Recuerda aplicar rigurosamente la regla de anonimización con iniciales (ej. M.E.V.V.) para víctimas, imputados/partes particulares, testigos, peritos y familiares en todos los campos:
 
 ${text}`;
     }
 
     const systemInstruction = `Eres un experto jurista y analista judicial. Tu función es examinar sentencias judiciales (en materias civil, penal, laboral, constitucional, etc.) y extraer o sintetizar rigurosamente una ficha de análisis estructurada en formato JSON.
 
+REGLA FUNDAMENTAL DE PROTECCIÓN DE DATOS SENSIBLES Y ANONIMIZACIÓN (OBLIGATORIA Y TRANSVERSAL):
+Por estrictas razones de privacidad, protección de datos personales y garantías procesales judiciales, DEBES ANONIMIZAR todos los nombres de personas naturales involucradas en la causa, sustituyéndolos EXCLUSIVAMENTE por sus iniciales en mayúsculas separadas por puntos (ejemplo: si la imputada es "Marión Estefani Vera Vera", consignar "M.E.V.V."; si el testigo o víctima es "Cristian Alejandro Arellano Muñoz", consignar "C.A.A.M.").
+
+1. ¿A quiénes se anonimiza obligatoriamente?
+   - Sujetos activos y pasivos particulares (imputados, acusados, condenados, demandantes o demandados personas naturales).
+   - Víctimas y personas ofendidas.
+   - Testigos (presenciales o de oídas), denunciantes, familiares y terceros particulares.
+   - Peritos particulares u otros intervinientes civiles/penales similares.
+
+2. ¿Dónde se aplica la anonimización?
+   - En TODOS y cada uno de los campos de la ficha: en "partes", en "hechos", en las hipótesis fácticas comparables "6.1" y "6.2", en "pruebasRendidas", en "valoracionPrueba", en "decision", en "fallo", y en cualquier mención de los relatos. NUNCA reveles el nombre y apellido completo de personas naturales protegidas en ningún campo.
+
+3. EXCEPCIONES EXPRESAS (NO anonimizar, conservar su nombre):
+   - Operadores del sistema judicial y autoridades públicas en ejercicio formal de su cargo: Fiscales del Ministerio Público (ej. "Fiscal Jorge Velozo Correa"), defensores penales públicos o licitados (ej. "defensora pública licitada Catalina Galeas Parada"), jueces/magistrados, y abogados particulares patrocinantes o mandatarios judiciales.
+   - Autores y juristas doctrinarios citados en obras, libros o jurisprudencia (ej. "Jean Pierre Matus", "Hernán Silva Silva", etc.).
+   - Personas jurídicas, órganos del Estado e instituciones públicas (ej. "Gendarmería de Chile", "Carabineros de Chile", "Ministerio Público", "Instituto de Salud Pública", "Banco Estado", "Constructora SpA", etc.).
+
 Debes completar los siguientes 10 campos según las definiciones exactas:
 1. rol: Identificación de la causa según el sistema de asignación numérica (ej. 123-2026, RIT 405-2024, C-1234-2024).
-2. tribunal: Tribunal o juzgado que conoce del caso (ej. 3° Juzgado Civil de Santiago).
-3. partes: Involucrados en el caso expresando sus roles (ej. Demandante: ..., Demandado: ..., Querellante, Imputado, etc.). IMPORTANTE: entrega cada interviniente en su propia línea (separados por un salto de línea simple \\n), en formato "Rol: Nombre completo". No los enumeres en un mismo párrafo separados por comas o punto y coma.
-4. tipoProcedimiento: Tipo de procedimiento judicial (ej. Juicio ordinario de mayor cuantía, Procedimiento abreviado, Tutela laboral).
-5. hechos: Resumen abreviado de los hechos que consideró el tribunal para justificar su decisión.
-6. razonamientos: Objeto con 7 sub-elementos detallados:
+2. tribunal: Tribunal o juzgado que conoce del caso (ej. 3° Juzgado Civil de Santiago, Tribunal de Juicio Oral en lo Penal de Antofagasta).
+3. partes: Involucrados en el caso expresando sus roles (ej. Demandante: ..., Demandado: ..., Querellante: ..., Imputado: ..., Víctima: ..., etc.). IMPORTANTE: entrega cada interviniente en su propia línea (separados por un salto de línea simple \\n), en formato "Rol: Iniciales o Nombre". Recuerda anonimizar rigurosamente con iniciales a las personas naturales protegidas (ej. "Imputada: M.E.V.V.", "Víctima: J.P.S."), conservando el nombre de fiscales, defensores y abogados. No los enumeres en un mismo párrafo separados por comas o punto y coma.
+4. tipoProcedimiento: Tipo de procedimiento judicial (ej. Juicio ordinario de mayor cuantía, Procedimiento abreviado, Juicio oral en lo penal, Tutela laboral).
+5. hechos: Resumen abreviado de los hechos que consideró el tribunal para justificar su decisión (aplicando anonimización con iniciales a todas las personas protegidas).
+6. razonamientos: Objeto con 7 sub-elementos detallados (aplicando anonimización con iniciales en todos ellos):
    - hipotesisSujetoActivo: Describir la hipótesis fáctica del sujeto activo de la acción bajo la forma de un relato (cronológico o por requisitos normativos).
    - hipotesisSujetoPasivo: Describir la hipótesis fáctica del sujeto pasivo de la acción bajo la forma de un relato.
-   IMPORTANTE sobre 6.1 y 6.2: redáctalas de modo que sean directamente comparables punto por punto entre sí (se mostrarán una junto a la otra). Sigue en ambas, en lo posible, el mismo orden de ejes: (a) quién es el sujeto y su rol, (b) qué acción u omisión se le atribuye o qué defensa opone, (c) fundamento jurídico invocado (norma o calificación), (d) consecuencia o pretensión que se solicita. Mantén una extensión similar entre ambas.
+   IMPORTANTE sobre 6.1 y 6.2: redáctalas de modo que sean directamente comparables punto por punto entre sí (se mostrarán una junto a la otra). Sigue en ambas, en lo posible, el mismo orden de ejes: (a) quién es el sujeto y su rol (con iniciales), (b) qué acción u omisión se le atribuye o qué defensa opone, (c) fundamento jurídico invocado (norma o calificación), (d) consecuencia o pretensión que se solicita. Mantén una extensión similar entre ambas.
    - hechosPacificos: Despejar hechos pacíficos y no controvertidos o convenciones probatorias.
-   - pruebasRendidas: Seleccionar las pruebas rendidas que benefician o perjudican al sujeto activo y al sujeto pasivo.
+   - pruebasRendidas: Seleccionar las pruebas rendidas que benefician o perjudican al sujeto activo y al sujeto pasivo (anonimizando nombres de testigos particulares, ej. "Testimonio de testigo presencial Y.D.E.L.").
    - valoracionPrueba: Valoración individual y conjunta de la prueba rendida, indicando el sistema de valoración (sana crítica, legal, etc.) y el valor asignado.
    - reglasDecision: Reglas de decisión, estándar de prueba aplicable (ej. más allá de toda duda razonable, preponderancia) y carga de la prueba.
    - pruebaIrrelevante: Indicar si existió prueba irrelevante, sobreabundante o inconducente, además de prueba excluida.
 7. decision: Respuesta del tribunal a las cuestiones jurídicas planteadas en términos afirmativos o negativos.
-8. fallo: Decisión de condena o absolución y el pronunciamiento que recae sobre todo lo solicitado por las partes.
+8. fallo: Decisión de condena o absolución y el pronunciamiento que recae sobre todo lo solicitado por las partes (anonimizando con iniciales a personas condenadas o absueltas).
 9. doctrinaNormativaJurisprudencia: Artículos de leyes, códigos y normativa citada (nacional e internacional), referencias a textos de autores/doctrina y sentencias previas.
 10. comentario: Breve reseña del caso con sus aspectos relevantes y aplicabilidad en casos similares.
 
