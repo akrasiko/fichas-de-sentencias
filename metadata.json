@@ -1,0 +1,6 @@
+{
+  "name": "Análisis de Sentencias Judiciales",
+  "description": "Generador de fichas de análisis y resumen estructurado de sentencias judiciales mediante inteligencia artificial según pautas del Poder Judicial y la Academia Judicial.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
